@@ -1,4 +1,4 @@
-const boardJson = './json/board.json';
+const boardJson = '/json/board.json';
 
 export async function getSquares() {
     const response = await fetch(boardJson);
@@ -6,7 +6,7 @@ export async function getSquares() {
     return dataBoard;
 }
 
-const piecesJson = './json/pieces.json';
+const piecesJson = '/json/pieces.json';
 
 export async function getPieces() {
     const response = await fetch(piecesJson);
