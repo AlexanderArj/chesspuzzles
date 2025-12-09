@@ -12,6 +12,7 @@ export async function initApp() {
   const boardData = await getSquares();
   let piecesData = await getPieces();
 
+
   const unidadPX = tablero.clientWidth / 8;
 
   const board = new Board(boardData, tablero);
@@ -27,10 +28,10 @@ export async function initApp() {
   // daily puzzle
 
   const dailyPuzzleMoves = await getDailyPuzzle();
-  console.log(dailyPuzzleMoves);
+  // console.log(dailyPuzzleMoves);
 
   const randomPuzzleMoves = await getRandomPuzzle();
-  console.log(randomPuzzleMoves);
+  // console.log(randomPuzzleMoves);
 
   // test
 
@@ -103,7 +104,7 @@ export async function initApp() {
           deletePiece(tablero, enemyPieceContainer);
         } else { enemyPiece = null;}
 
-        console.log(piecesData);
+        // console.log(piecesData);
 
         makeMove(piecePgnToMove, [finalSquare.file, finalSquare.rank], unidadPX);
 

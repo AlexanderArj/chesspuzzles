@@ -1,8 +1,22 @@
+let alPaso;
+let alPasoValidation;
+
 export function makeMove(piece, finalPosition, unidadD) {
 
     const [finalCol, finalRow] = finalPosition;
 
     const pContainer = document.querySelector(`[data-id="${piece.pId}"]`);
+
+    if(piece.notation === 'P' && Math.abs(finalRow - piece.rank) === 2) {
+        alPaso = [finalCol - 1, finalCol + 1];
+        alPasoValidation = true;
+    }
+
+    else {
+        alPaso = [];
+        alPasoValidation = false;
+    }
+
     piece.file = finalCol;
     piece.rank = finalRow;
 
@@ -25,7 +39,7 @@ export function initialPositionAllPieces(pieces, unidadD) {
 }
 
 
-export function moveValidation(piece, destinationSquare) {
+export function moveValidation(piece, destinationSquare, boardData, piecesData) {
 
     const fileDiff = Math.abs(destinationSquare.file - piece.file);
     const rankDiff = Math.abs(destinationSquare.rank - piece.rank);
@@ -34,53 +48,10 @@ export function moveValidation(piece, destinationSquare) {
     switch (piece.notation) {
 
         case "P":
+            let potentialSquares = validatePawnMove(piece, boardData, piecesData);
+            const isValid = potentialSquares.some( validS => destinationSquare.square === validS.square);
 
-            let forward;
-
-            if (piece.color === "white") {
-                forward = -1;
-            } else {
-                forward = 1;
-            }
-
-            // si no hay movimiento, cambio de posicion
-
-            if (rankDirection * forward <= 0) {
-                return { message: "Invalid", validMove: false };
-            }
-
-            if (rankDirection === 2 * forward && fileDiff === 0) {
-
-                let startRank;
-
-                if (piece.color === "white") {
-                    startRank = 6;
-                } else {
-                    startRank = 1;
-                }
-
-                if (piece.rank === startRank) {
-                    return true;
-                }
-
-                return { message: "Invalid", validMove: false };
-            }
-
-            if (rankDirection === forward) {
-
-                if (fileDiff === 0) {
-                    return true;
-                }
-
-                if (fileDiff === 1) {
-                    return true;
-                }
-
-                return { message: "Invalid", validMove: false };
-            }
-
-            return { message: "Invalid", validMove: false };
-
+            return isValid;
 
         case "R":
 
@@ -213,8 +184,9 @@ export function findPieceByPgn (piecesData, boardData, pgnArray, pcolor) {
 
         console.log(piecesToConsider);
 
-        if ( pgnArray.length === 3) {
+        if ( pgnArray.length === 3 || (pgnArray.length === 4 && (last === "+"|| last ==="#"))) {
             // jugaada tipo Nb5
+            // jugada tipo Nf6+ o Nf6#
             // este caso puede implicar el arreglo piecesToC, hay que encontrar el caballo que puede hacer el movimiento
 
             destinationSquare = boardData.find(s => s.square === (pgnArray[1].toString() + pgnArray[2].toString()));
@@ -223,7 +195,7 @@ export function findPieceByPgn (piecesData, boardData, pgnArray, pcolor) {
             if (piecesToConsider.length > 1) {
                 // si hay mas de dos para considerar, entonces debemos validar para cada pieza con esta funcion
                 // en este punto pieceToMove es nulo
-                return getPieceFromArray(pieceToMove, piecesToConsider, destinationSquare);
+                return getPieceFromArray(pieceToMove, piecesToConsider, destinationSquare, boardData, piecesData);
             }
 
             // si no tiene mas un mismo tipo de pieza repetido
@@ -280,7 +252,7 @@ export function findPieceByPgn (piecesData, boardData, pgnArray, pcolor) {
         // porque de otra manera se escribiria como Nbxd5, entonces incluso si hay mas piezas del mismo tipo la funcion getPiecefromA deberia 
         // devolver sola la pieza que puede hacer el movimiento segun la funcion de validación
        
-        return getPieceFromArray(pieceToMove, piecesToConsider, destinationSquare);
+        return getPieceFromArray(pieceToMove, piecesToConsider, destinationSquare, boardData, piecesData);
 
     }
 
@@ -301,7 +273,7 @@ export function findPieceByPgn (piecesData, boardData, pgnArray, pcolor) {
                 promoPiece = last;
             }
 
-            if (last === '+' || last === '#') {
+            else if (last === '+' || last === '#') {
 
                 // promo with check
 
@@ -317,43 +289,28 @@ export function findPieceByPgn (piecesData, boardData, pgnArray, pcolor) {
             }
 
             else {
-                if (piecesNotation.includes(last) && last !== 'K') {
-                    destinationS = pgnArray[pgnArray.length - 3].toString() + pgnArray[pgnArray.length - 2].toString();
-                    promoPiece = last;
-                } else if (last === '+' || last === '#') {
-                    if (piecesNotation.includes(pgnArray[pgnArray.length - 2])) {
-                        promoPiece = pgnArray[pgnArray.length - 2];
-                        destinationS = pgnArray[pgnArray.length - 5].toString() + pgnArray[pgnArray.length - 4].toString();
-                    } else {
-                        destinationS = pgnArray[pgnArray.length - 3].toString() + pgnArray[pgnArray.length - 2].toString();
-                    }
-                } else {
-                    destinationS = pgnArray[pgnArray.length - 2].toString() + pgnArray[pgnArray.length - 1].toString();
-                }
+                destinationS = pgnArray[pgnArray.length - 2].toString() + pgnArray[pgnArray.length - 1].toString();
+                console.log(destinationS);
             }
-
+            
             destinationSquare = boardData.find( s => s.square === destinationS);
+            console.log(destinationSquare);
 
             pawnsToConsider = piecesData.filter( pawn => pawn.notation === 'P' && pawn.color === pcolor 
                 && pawn.file === fileOrRankNumber);
+            console.log(pawnsToConsider);
             
             if (pawnsToConsider.length > 1) {
-
-                for (let p = 0; p < pawnsToConsider.length; p++) {
-
-                    const min = Math.abs(pawnsToConsider[p].rank - destinationSquare.rank)
-                    if ( min < auxMinDiff) {
-                        pieceToMove = pawnsToConsider[p];
-                        auxMinDiff = min;
-                    }
-                }
+                return getPieceFromArray(pieceToMove, pawnsToConsider, destinationSquare, boardData, piecesData);
             }
 
             else {
                 if (pawnsToConsider.length === 0) {
                     return { error: "No pawn found for the given file and color", piece: null, destinationSquare };
                 }
+
                 pieceToMove = pawnsToConsider[0];
+
             }
 
         }
@@ -364,22 +321,11 @@ export function findPieceByPgn (piecesData, boardData, pgnArray, pcolor) {
 
 }
 
-function getPieceFromArray(pieceToMove, piecesToConsider, destinationSquare) {
+function getPieceFromArray(pieceToMove, piecesToConsider, destinationSquare, boardData, piecesData) {
 
-
-    // recibe una variable nula, pieceToMove
-    // piecesToConsider es una arreglo de piezas, por ejemplo todos los caballos blancos
-
-    
     for (let piece =0; piece < piecesToConsider.length; piece++){
-        // valida el movimiento para cada pieza del arreglo y asinga el valor a la pieza
-        // aqui hay un error por que si para mas de una pieza el movimiento es valido entonces
-        // se queda con la ultima o pieza encontrada
-        // por ejemplo un caballo en b6 y otro en f6, se queda con el ultimo encontrado sin importar
-        // si el movimiento es Nbd6
-        // para jugadas tipo Nbd6 esta funcion no puede llamarse
 
-        if (moveValidation(piecesToConsider[piece], destinationSquare) === true){
+        if (moveValidation(piecesToConsider[piece], destinationSquare, boardData, piecesData) === true){
             pieceToMove = piecesToConsider[piece];
         } 
     }
@@ -417,3 +363,91 @@ function rankReferences (num) {
             return;
     }
 }
+
+// desarrollar una funcion que evalue todas las posibles casillas para una pieza segun su posicion inicial
+
+export function validatePawnMove(pawn, boardData, piecesData) {
+
+    let potentialSquare;
+    let pieceF;
+    let startRank = false;
+
+    if ((pawn.color === 'white' && pawn.rank === 6) || 
+        (pawn.color === 'black' && pawn.rank === 1)) {
+        startRank = true;
+    }
+
+    potentialSquare = boardData.filter(s => {
+
+        let forwardMovement;
+
+        if (pawn.color === 'white') {
+            forwardMovement = s.rank < pawn.rank;
+        } else {
+            forwardMovement = s.rank > pawn.rank;
+        }
+
+        let diff = Math.abs(s.rank - pawn.rank);
+
+        return (
+            s.file === pawn.file &&
+            forwardMovement &&
+            (
+                diff === 1 ||
+                (diff === 2 && startRank)
+            )
+        );
+    });
+
+    for (let i = 0; i < potentialSquare.length; i++) {
+
+        pieceF = piecesData.find(p =>
+            p.file === potentialSquare[i].file &&
+            p.rank === potentialSquare[i].rank
+        );
+
+        if (pieceF) {
+
+            if (Math.abs(potentialSquare[i].rank - pawn.rank) === 1) {
+                potentialSquare = [];
+                break;
+            }
+
+            potentialSquare[i] = null;
+        }
+    }
+
+    potentialSquare = potentialSquare.filter(s => s !== null);
+
+    let captureRank;
+
+    if (pawn.color === 'white') {
+        captureRank = pawn.rank - 1;
+    } else {
+        captureRank = pawn.rank + 1;
+    }
+
+    let captureFiles = [pawn.file - 1, pawn.file + 1];
+
+    for (let cf of captureFiles) {
+
+        let captureSquare = boardData.find( s => s.file === cf && s.rank === captureRank);
+        if (!captureSquare) continue;
+
+        let pieceAtSquare = piecesData.find( p => p.file === cf && p.rank === captureRank);
+
+        if (pieceAtSquare && pieceAtSquare.color !== pawn.color) {
+            potentialSquare.push(captureSquare);
+        }
+
+        if (alPasoValidation) {
+            if(pawn.file === alPaso[0] || pawn.file === alPaso[1]){
+                potentialSquare.push(captureSquare);
+            }
+        }
+
+    }
+
+    return potentialSquare;
+}
+

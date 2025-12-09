@@ -2,7 +2,7 @@
 
     "game": {
 
-        "pgn": "e4 Nf6 Ne2 d6 Nbc3 Na6 Nf4 Nd7 Ncd5 Nac5 Nf6+ Nxf6 g3 Qd7 Bg2 b6 O-O Bb7 Qe2 O-O-O c3 a6 d4 Ncxe4 Bxe4 Bxe4 Qxe4 Nxe4 d5 e6 dxe6 fxe6 Be3 Qa4 Rad1 Qa3 bxa3 d5 Rd4 c5 a4 g6 a5 h5 Rfd1 h4 gxh4 g5 f3 g4 fxg4 Rh5 gxh5 e5 R4d3 d4 h6 dxe3 h7 Rxd3 h5 Rxd1+ Kg2 e2 h6 c4 h4"
+        "pgn": "d4 h6 d5 e5 dxe6 c5 h4 c4 b4 cxb3 Nf3 h5 Nd4 g6 g4 hxg4 f4 Nc6 Bg2"
 
     }
 
