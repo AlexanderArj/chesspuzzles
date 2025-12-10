@@ -12,7 +12,6 @@ export async function initApp() {
   const boardData = await getSquares();
   let piecesData = await getPieces();
 
-
   const unidadPX = tablero.clientWidth / 8;
 
   const board = new Board(boardData, tablero);
@@ -21,6 +20,24 @@ export async function initApp() {
   await createAllPieces();
 
   initialPositionAllPieces(piecesData, unidadPX);
+
+
+function resizeBoard() {
+    const boardElement = document.querySelector("#chess-board");
+    const pieces = document.querySelectorAll(".piece");
+
+    const unidad = boardElement.clientWidth / 8;
+
+    pieces.forEach(piece => {
+        const file = Number(piece.dataset.file); 
+        const rank = Number(piece.dataset.rank); 
+        piece.style.transform = `translate(${file * unidad}px, ${rank * unidad}px)`;
+    });
+}
+
+window.addEventListener("resize", resizeBoard);
+
+resizeBoard();
 
   const moves = await getMoves();
   // console.log(moves);
@@ -52,7 +69,7 @@ export async function initApp() {
   const pgnMoves = dailyPuzzleMoves.game.pgn;
 
   const pgnToPlay = getPgnMoves(pgnMoves);
-  console.log(pgnToPlay);
+  // console.log(pgnToPlay);
 
   // pgnToPlay.forEach(pgnNotation => {
 
@@ -81,7 +98,7 @@ export async function initApp() {
       }
 
       const pgnNotation = pgnEachMoveToArray(testToPlay[i]);
-      console.log(pgnNotation);
+      // console.log(pgnNotation);
 
       const pieceAndSquare = findPieceByPgn(piecesData, boardData, pgnNotation, pcolor);
       console.log(pieceAndSquare);

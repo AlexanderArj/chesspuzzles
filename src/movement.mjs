@@ -7,12 +7,10 @@ export function makeMove(piece, finalPosition, unidadD) {
 
     const pContainer = document.querySelector(`[data-id="${piece.pId}"]`);
 
-    if(piece.notation === 'P' && Math.abs(finalRow - piece.rank) === 2) {
+    if (piece.notation === 'P' && Math.abs(finalRow - piece.rank) === 2) {
         alPaso = [finalCol - 1, finalCol + 1];
         alPasoValidation = true;
-    }
-
-    else {
+    } else {
         alPaso = [];
         alPasoValidation = false;
     }
@@ -20,12 +18,14 @@ export function makeMove(piece, finalPosition, unidadD) {
     piece.file = finalCol;
     piece.rank = finalRow;
 
+    pContainer.dataset.file = finalCol;
+    pContainer.dataset.rank = finalRow;
+
     const pixelC = finalCol * unidadD;
     const pixelR = finalRow * unidadD;
 
     pContainer.style.transform = `translate(${pixelC}px, ${pixelR}px)`;
 }
-
 
 export function initialPositionAllPieces(pieces, unidadD) {
 
@@ -41,82 +41,50 @@ export function initialPositionAllPieces(pieces, unidadD) {
 
 export function moveValidation(piece, destinationSquare, boardData, piecesData) {
 
-    const fileDiff = Math.abs(destinationSquare.file - piece.file);
-    const rankDiff = Math.abs(destinationSquare.rank - piece.rank);
-    const rankDirection = destinationSquare.rank - piece.rank;
+    let potentialSquares;
+    let isValid;
 
     switch (piece.notation) {
 
         case "P":
-            let potentialSquares = validatePawnMove(piece, boardData, piecesData);
-            const isValid = potentialSquares.some( validS => destinationSquare.square === validS.square);
+            potentialSquares = validatePawnMove(piece, boardData, piecesData);
+            isValid = potentialSquares.some( validS => destinationSquare.square === validS.square);
 
             return isValid;
 
         case "R":
 
-            if (piece.rank === destinationSquare.rank) {
-                return true;
-            }
+            potentialSquares = validateRookMove(piece, boardData, piecesData);
+            isValid = potentialSquares.some( validS => destinationSquare.square === validS.square);
 
-            if (piece.file === destinationSquare.file) {
-                return true;
-            }
-
-            return { message: "Invalid", validMove: false };
-
+            return isValid;
 
         case "N":
 
-            if (fileDiff === 1 && rankDiff === 2) {
-                return true;
-            }
+            potentialSquares = validateKnightMove(piece, boardData, piecesData);
+            isValid = potentialSquares.some( validS => destinationSquare.square === validS.square);
 
-            if (fileDiff === 2 && rankDiff === 1) {
-                return true;
-            }
-
-            return { message: "Invalid", validMove: false };
-
+            return isValid;
 
         case "B":
 
-            if (fileDiff === rankDiff) {
-                return true;
-            }
+            potentialSquares = validateBishopMove(piece, boardData, piecesData);
+            isValid = potentialSquares.some( validS => destinationSquare.square === validS.square);
 
-            return { message: "Invalid", validMove: false };
-
+            return isValid;
 
         case "Q":
 
-            if (fileDiff === rankDiff) {
-                return true;
-            }
+            potentialSquares = validateQueenMove(piece, boardData, piecesData);
+            isValid = potentialSquares.some( validS => destinationSquare.square === validS.square);
 
-            if (piece.rank === destinationSquare.rank) {
-                return true;
-            }
-
-            if (piece.file === destinationSquare.file) {
-                return true;
-            }
-
-            return { message: "Invalid", validMove: false };
-
+            return isValid;
 
         case "K":
+            potentialSquares = validateKingMove(piece, boardData, piecesData);
+            isValid = potentialSquares.some( validS => destinationSquare.square === validS.square);
 
-            if (fileDiff <= 1 && rankDiff <= 1) {
-
-                if (fileDiff === 0 && rankDiff === 0) {
-                    return { message: "Invalid", validMove: false };
-                }
-
-                return true;
-            }
-
-            return { message: "Invalid", validMove: false };
+            return isValid;
 
 
         default:
@@ -139,7 +107,6 @@ export function findPieceByPgn (piecesData, boardData, pgnArray, pcolor) {
     const last = pgnArray[pgnArray.length - 1];
     const piecesNotation = ['K', 'Q', 'R', 'B', 'N'];
     let promoPiece;
-    let auxMinDiff = 9;
 
     if ( pgnArray[0].toLowerCase() === 'o') {
 
@@ -450,4 +417,201 @@ export function validatePawnMove(pawn, boardData, piecesData) {
 
     return potentialSquare;
 }
+
+export function validateRookMove(rook, boardData, piecesData) {
+
+    let potentialSquares = [];
+
+    function checkDirection(startFile, startRank, dx, dy) {
+
+        let f = startFile + dx;
+        let r = startRank + dy;
+
+        while (f >= 0 && f <= 7 && r >= 0 && r <= 7) {
+
+            let pieceF = piecesData.find(p => p.file === f && p.rank === r);
+            let validSquare = boardData.find(s => s.file === f && s.rank === r);
+
+            if (pieceF) {
+                if (pieceF.color != rook.color) {
+                    potentialSquares.push(validSquare);
+                }
+                break; 
+            }
+
+            potentialSquares.push(validSquare);
+
+            f = f + dx;
+            r = r + dy;
+        }
+    }
+
+    checkDirection(rook.file, rook.rank,  0, -1); 
+
+    checkDirection(rook.file, rook.rank,  0, +1); 
+
+    checkDirection(rook.file, rook.rank, -1,  0); 
+
+    checkDirection(rook.file, rook.rank, +1,  0);
+
+    return potentialSquares;
+}
+
+
+export function validateKnightMove(knight, boardData, piecesData) {
+
+    let potentialSquares = [];
+    potentialSquares = boardData.filter(s => {
+
+        let lShape = false;
+        let pieceSameColor;
+
+        if (Math.abs(s.file - knight.file) === 1 && Math.abs(s.rank - knight.rank) === 2) {
+            lShape = true;
+        }
+
+        if (Math.abs(s.file - knight.file) === 2 && Math.abs(s.rank - knight.rank) === 1) {
+            lShape = true;
+        }
+
+        pieceSameColor = piecesData.find(ps =>
+            ps.file === s.file &&
+            ps.rank === s.rank &&
+            ps.color === knight.color
+        );
+
+        return (lShape === true && !pieceSameColor);
+    });
+
+    return potentialSquares;
+}
+
+
+export function validateBishopMove(bishop, boardData, piecesData) {
+
+    let potentialSquares = [];
+
+    checkDirection(bishop, 1, 1, piecesData, boardData, potentialSquares);
+    checkDirection(bishop, 1, -1, piecesData, boardData, potentialSquares);
+    checkDirection(bishop, -1, 1, piecesData, boardData, potentialSquares);
+    checkDirection(bishop, -1, -1, piecesData, boardData, potentialSquares);
+
+    return potentialSquares;
+}
+
+function checkDirection(bishop, dx, dy, piecesData, boardData, potentialSquares) {
+    let f = bishop.file + dx;
+    let r = bishop.rank + dy;
+
+    while (f >= 0 && f <= 7 && r >= 0 && r <= 7) {
+
+        let piece = piecesData.find(p => p.file === f && p.rank === r);
+        let square = boardData.find(s => s.file === f && s.rank === r);
+
+        if (!square) break;
+
+        if (piece) {
+
+            if (piece.color != bishop.color) {
+                potentialSquares.push(square);
+            }
+
+            break;
+        }
+
+        potentialSquares.push(square);
+
+        f = f + dx;
+        r = r + dy;
+    }
+}
+
+export function validateKingMove(king, boardData, piecesData) {
+
+    let potentialSquares = [];
+
+    let directions = [
+        { dx: 1, dy: 0 },
+        { dx: -1, dy: 0 },
+        { dx: 0, dy: 1 },
+        { dx: 0, dy: -1 },
+
+        { dx: 1, dy: 1 },
+        { dx: 1, dy: -1 },
+        { dx: -1, dy: 1 },
+        { dx: -1, dy: -1 }
+    ];
+
+    directions.forEach(dir => {
+
+        let f = king.file + dir.dx;
+        let r = king.rank + dir.dy;
+
+        if (f >= 0 && f <= 7 && r >= 0 && r <= 7) {
+
+            let square = boardData.find(s => s.file === f && s.rank === r);
+            let piece = piecesData.find(p => p.file === f && p.rank === r);
+
+            if (piece && piece.color === king.color) {
+                return;
+            }
+
+            potentialSquares.push(square);
+        }
+    });
+
+    return potentialSquares;
+}
+
+export function validateQueenMove(queen, boardData, piecesData) {
+
+    let potentialSquares = [];
+
+    checkDirectionQueen(queen, 1, 0, piecesData, boardData, potentialSquares);   
+    checkDirectionQueen(queen, -1, 0, piecesData, boardData, potentialSquares);  
+    checkDirectionQueen(queen, 0, 1, piecesData, boardData, potentialSquares); 
+    checkDirectionQueen(queen, 0, -1, piecesData, boardData, potentialSquares);
+
+    checkDirectionQueen(queen, 1, 1, piecesData, boardData, potentialSquares);  
+    checkDirectionQueen(queen, 1, -1, piecesData, boardData, potentialSquares); 
+    checkDirectionQueen(queen, -1, 1, piecesData, boardData, potentialSquares);  
+    checkDirectionQueen(queen, -1, -1, piecesData, boardData, potentialSquares);
+
+    return potentialSquares;
+}
+
+function checkDirectionQueen(queen, dx, dy, piecesData, boardData, potentialSquares) {
+
+    let f = queen.file + dx;
+    let r = queen.rank + dy;
+
+    while (f >= 0 && f <= 7 && r >= 0 && r <= 7) {
+
+        let square = boardData.find(s => s.file === f && s.rank === r);
+        let piece = piecesData.find(p => p.file === f && p.rank === r);
+
+        if (!square) break;
+
+        if (piece) {
+
+            if (piece.color != queen.color) {
+                potentialSquares.push(square);
+            }
+
+            break;
+        }
+
+        potentialSquares.push(square);
+
+        f = f + dx;
+        r = r + dy;
+    }
+}
+
+
+
+
+
+
+
 

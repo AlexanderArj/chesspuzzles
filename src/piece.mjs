@@ -14,6 +14,8 @@ export default class Piece {
         pImage.setAttribute('alt', `${piece.color} ${piece.category} icon`);
         
         pContainer.dataset.id = this.piece.pId;
+        pContainer.dataset.file = this.piece.file;  
+        pContainer.dataset.rank = this.piece.rank;
 
         pContainer.style.transform = `translate(0px, 0px)`;
 
