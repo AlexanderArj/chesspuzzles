@@ -1,7 +1,8 @@
 
-import { validateKingMove, validateQueenMove } from "./kingAndQueen.mjs";
+import { validateKingMove, validateQueenMove, validateRookMove } from "./kingQueenRook.mjs";
 import { validateBishopMove, validateKnightMove} from "./knightAndBishop.mjs";
-import {validateRookMove, validatePawnMove} from "./rookAndPawn.mjs";
+import { validatePawnMove } from "./pawn.mjs";
+
 
 export function moveValidation(piece, destinationSquare, boardData, piecesData) {
 
@@ -11,8 +12,15 @@ export function moveValidation(piece, destinationSquare, boardData, piecesData) 
     switch (piece.notation) {
 
         case "P":
+
             potentialSquares = validatePawnMove(piece, boardData, piecesData);
             isValid = potentialSquares.some( validS => destinationSquare.square === validS.square);
+
+            // para regresar la pieza a ser capturada, peon al paso?
+
+            if (potentialSquares[1]) {
+                return [isValid, potentialSquares[1]];
+            }
 
             return isValid;
 

@@ -22,6 +22,5 @@ export default class Piece {
         pContainer.appendChild(pImage);
         mainCointainer.appendChild(pContainer);
 
-        // console.log(pContainer);
     }
 }

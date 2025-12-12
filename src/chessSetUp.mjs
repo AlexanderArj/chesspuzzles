@@ -27,7 +27,6 @@ export async function getDailyPuzzle() {
 
     const dailyPuzzleData = await response.json();
     
-    // console.log(dailyPuzzleData);
     return dailyPuzzleData;
     
   } catch (error) {

@@ -6,11 +6,16 @@ import { findPieceByPgn } from "./findPiecePgn.mjs";
 import { getMoves, splitMoves, splitAlgebraicNotation, getPgnMoves, pgnEachMoveToArray, getTestMoves } from "./readMove.mjs";
 import { resizeBoard, sleepPgn, deletePiece } from "./utils.mjs";
 import { displayMoves, highlightMove} from "./moveNotation.mjs";
+import { gameState } from "./gameState.mjs";
+
 
 export async function initApp() {
+  // tablero y piezas 
+
   const tablero = document.getElementById('chess-board');
 
   const boardData = await getSquares();
+
   let piecesData = await getPieces();
 
   const unidadPX = tablero.clientWidth / 8;
@@ -21,33 +26,47 @@ export async function initApp() {
   await createAllPieces();
 
   initialPositionAllPieces(piecesData, unidadPX);
-  
+
+
   window.addEventListener("resize", resizeBoard);
 
   resizeBoard();
 
+  // *********************************
+
+  // Obtener jugadas a reproducir
+
   const dailyPuzzleMoves = await getDailyPuzzle();
-  console.log(dailyPuzzleMoves);
   const pgnMoves = dailyPuzzleMoves.game.pgn;
 
   const pgnMovesToPlay = getPgnMoves(pgnMoves);
 
   displayMoves(pgnMovesToPlay);
 
+  // **********************************
+
+  // funcion que reproduce el PGN
+
   async function playPgn() {
+
     for (let i = 0; i < pgnMovesToPlay.length; i++) {
+      // revisar esto:
       let pcolor = i === 0 || i % 2 === 0 ? 'white' : 'black';
 
       const pgnNotation = pgnEachMoveToArray(pgnMovesToPlay[i]);
-      console.log(pgnNotation);
+
+
+      // findPiecebyPgn devuelve una pieza y una casilla destino solamente.
 
       const pieceAndSquare = findPieceByPgn(piecesData, boardData, pgnNotation, pcolor);
-      console.log(pieceAndSquare);
 
       let piecePgnToMove;
       let finalSquare;
       let king;
       let rookToMovePgn;
+
+      // [piece, destination] jugadas normalas
+      // enrroque [piece, destination, piece, destination]
 
       if (pieceAndSquare.length === 2) {
         piecePgnToMove = pieceAndSquare[0];
@@ -77,6 +96,9 @@ export async function initApp() {
       await sleepPgn(2000);
     }
   }
-
+// llamado a la funcion de reproduccion
   playPgn();
+
+
+
 }

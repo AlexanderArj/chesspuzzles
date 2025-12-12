@@ -1,20 +1,9 @@
-let alPaso;
-let alPasoValidation;
-
 export function makeMove(piece, finalPosition, unidadD) {
 
     const [finalCol, finalRow] = finalPosition;
 
     const pContainer = document.querySelector(`[data-id="${piece.pId}"]`);
-
-    if (piece.notation === 'P' && Math.abs(finalRow - piece.rank) === 2) {
-        alPaso = [finalCol - 1, finalCol + 1];
-        alPasoValidation = true;
-    } else {
-        alPaso = [];
-        alPasoValidation = false;
-    }
-
+    
     piece.file = finalCol;
     piece.rank = finalRow;
 

@@ -53,21 +53,23 @@ export function findPieceByPgn (piecesData, boardData, pgnArray, pcolor) {
     if ( piecesNotation.includes(pgnArray[0])) {
         
         piecesToConsider = piecesData.filter(p => p.notation === pgnArray[0] && p.color === pcolor);
-        // ejemplo: todos los caballos que tiene el bando a jugar
-
-        // console.log(piecesToConsider);
+        // ok
 
         if ( pgnArray.length === 3 || (pgnArray.length === 4 && (last === "+"|| last ==="#"))) {
             // jugaada tipo Nb5
             // jugada tipo Nf6+ o Nf6#
             // este caso puede implicar el arreglo piecesToC, hay que encontrar el caballo que puede hacer el movimiento
+            // ok
 
             destinationSquare = boardData.find(s => s.square === (pgnArray[1].toString() + pgnArray[2].toString()));
             // se define el destination s con los dos ultimos elementos N, b, 5  
+            // ok
 
             if (piecesToConsider.length > 1) {
                 // si hay mas de dos para considerar, entonces debemos validar para cada pieza con esta funcion
                 // en este punto pieceToMove es nulo
+                // ok
+
                 return getPieceFromArray(pieceToMove, piecesToConsider, destinationSquare, boardData, piecesData);
             }
 
@@ -121,6 +123,8 @@ export function findPieceByPgn (piecesData, boardData, pgnArray, pcolor) {
 
         }
 
+        // ok
+
         // este return es para jugadas tipo Nxd5, donde el segundo caracter es x, en teoria solo un caballo puede hacer esta jugada
         // porque de otra manera se escribiria como Nbxd5, entonces incluso si hay mas piezas del mismo tipo la funcion getPiecefromA deberia 
         // devolver sola la pieza que puede hacer el movimiento segun la funcion de validación
@@ -129,13 +133,16 @@ export function findPieceByPgn (piecesData, boardData, pgnArray, pcolor) {
 
     }
 
+    // PEONES!!!!!!!
+
     else {
         
         if (pgnArray[0].toLowerCase() >= "a" && pgnArray[0].toLowerCase() <= "h") {
         
-            interior = pgnArray[0];
-            fileOrRankNumber = interior.charCodeAt(0) - "a".charCodeAt(0);
             // siempre fila
+            interior = pgnArray[0]; 
+
+            fileOrRankNumber = interior.charCodeAt(0) - "a".charCodeAt(0);
 
             // encontrar destination square
 
@@ -163,18 +170,19 @@ export function findPieceByPgn (piecesData, boardData, pgnArray, pcolor) {
 
             else {
                 destinationS = pgnArray[pgnArray.length - 2].toString() + pgnArray[pgnArray.length - 1].toString();
-                // console.log(destinationS);
             }
             
             destinationSquare = boardData.find( s => s.square === destinationS);
-            // console.log(destinationSquare);
+
+            // filtrar para saber si hay peones doblados
 
             pawnsToConsider = piecesData.filter( pawn => pawn.notation === 'P' && pawn.color === pcolor 
                 && pawn.file === fileOrRankNumber);
-            // console.log(pawnsToConsider);
             
             if (pawnsToConsider.length > 1) {
                 return getPieceFromArray(pieceToMove, pawnsToConsider, destinationSquare, boardData, piecesData);
+
+                // retornamos solo peon y
             }
 
             else {
@@ -188,22 +196,32 @@ export function findPieceByPgn (piecesData, boardData, pgnArray, pcolor) {
 
         }
 
+
+        // regresa jugadas tipo e4
+        return [pieceToMove, destinationSquare];
+
+
     }
-    
-    return [pieceToMove, destinationSquare];
+
+
 
 }
+
+
+// revisar esta funcion
 
 function getPieceFromArray(pieceToMove, piecesToConsider, destinationSquare, boardData, piecesData) {
 
     for (let piece =0; piece < piecesToConsider.length; piece++){
 
-        if (moveValidation(piecesToConsider[piece], destinationSquare, boardData, piecesData) === true){
+        if (moveValidation(piecesToConsider[piece], destinationSquare, boardData, piecesData) === true) {
             pieceToMove = piecesToConsider[piece];
         } 
     }
 
     return [pieceToMove, destinationSquare];
+    // regresa solo pieza y casilla destino, aca se podria implementar otras cosas tal vez
+    // para actualizar el estado del juego
 
 }
 

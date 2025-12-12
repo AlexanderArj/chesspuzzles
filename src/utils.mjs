@@ -19,6 +19,5 @@
 export function deletePiece(boardContainer, pContainer) {
 
     boardContainer.removeChild(pContainer);
-    // console.log("A piece has been deleted");
 
 }
