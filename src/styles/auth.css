@@ -1,0 +1,115 @@
+.auth-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: var(--sec-color); 
+    color: var(--text-white);
+    padding: 20px;
+}
+
+.auth-container header {
+    width: 100%;
+    max-width: 400px; 
+    margin-bottom: 20px;
+}
+
+.auth-container header a {
+    color: var(--main-color);
+    text-decoration: none;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+}
+
+.auth-container header a:hover {
+    color: var(--bg-sec-color); 
+}
+
+.auth-card {
+    background-color: var(--dark-squares); 
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.title {
+    color: var(--main-color);
+    margin-bottom: 25px;
+    font-size: 2rem;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.input-group {
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: var(--white-squares);
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid var(--border-chessb);
+    border-radius: 4px;
+    background-color: var(--main-color); 
+    color: var(--sec-color);
+    box-sizing: border-box; 
+    transition: border-color 0.3s ease;
+}
+
+.input-group input:focus {
+    border-color: var(--bg-sec-color);
+    outline: none;
+}
+
+.auth-btn {
+    padding: 12px 20px;
+    margin-top: 10px;
+    background-color: var(--bg-sec-color); 
+    color: var(--text-white);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.1s;
+}
+
+.auth-btn:hover {
+    background-color: #8c603b; 
+    transform: translateY(-1px);
+}
+
+.auth-btn:active {
+    transform: translateY(0);
+}
+
+.switch-link {
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: var(--white-squares);
+}
+
+.switch-link a {
+    color: var(--main-color);
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.switch-link a:hover {
+    color: var(--bg-sec-color);
+}

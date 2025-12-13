@@ -112,12 +112,6 @@ export function validatePawnMove(pawn, boardData, piecesData) {
             potentialSquare.push(captureSquare);
         }
 
-        if (alPasoValidation) {
-            if(pawn.file === alPaso[0] || pawn.file === alPaso[1]){
-                potentialSquare.push(captureSquare);
-            }
-        }
-
     }
 
     return potentialSquare;

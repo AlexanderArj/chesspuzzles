@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Chess Puzzles Master</title>
+    <link rel="stylesheet" href="src/styles/base.css">
+    <link rel="stylesheet" href="src/styles/auth.css">
+    <script type="module" src="src/login.js"></script>
+</head>
+<body>
+    <div class="auth-container">
+        <header>
+            <a href="/">
+                <h2>&lt;Back</h2>
+            </a>
+        </header>
+
+        <main class="auth-card">
+            <h1 class="title">Sign IN</h1>
+            <form id="loginForm" class="auth-form">
+                
+                <div class="input-group">
+                    <label for="login-identifier">User or email</label>
+                    <input type="text" id="login-identifier" name="identifier" required 
+                           placeholder="Usuario o ejemplo@dominio.com">
+                </div>
+
+                <div class="input-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" name="password" required 
+                           placeholder="Tu contraseña secreta">
+                </div>
+
+                <button type="submit" class="auth-btn">Enter</button>
+            </form>
+            <p class="switch-link">
+                No account? <a href="/register.html">Get one here</a>
+            </p>
+        </main>
+    </div>
+</body>
+</html>
