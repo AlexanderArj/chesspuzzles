@@ -2,16 +2,13 @@ import { initApp } from "./initApp.mjs";
 import { logoutUser } from './authUtils.js';
 
 const audio = document.getElementById("audio");
-
 const volumeBtn = document.getElementById("volumeBtn");
-
 const volumeIcon = document.getElementById("volumeIcon");
 
 const modal = document.getElementById("startModal");
 const startButton = document.getElementById("startButton");
 
 let isMuted = false;
-
 const vol = 0.2;
 
 function setupVolumeControl() {
@@ -33,13 +30,13 @@ startButton.addEventListener("click", () => {
     audio.play();
 
     modal.classList.add("fade-out");
-    setTimeout(() => { modal.style.display = "none"; }, 800);
+    setTimeout(() => {
+        modal.style.display = "none";
+    }, 800);
 
     initApp();
-
     setupVolumeControl();
 });
-
 
 document.addEventListener('DOMContentLoaded', () => {
     const authStatusElement = document.getElementById('authStatus');
@@ -59,7 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert("Sesión cerrada con éxito.");
                 window.location.reload();
             });
-
         } else {
             authStatusElement.innerHTML = `
                 <a href="/login.html">Login</a> | 
